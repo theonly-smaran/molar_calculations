@@ -15,6 +15,8 @@ atomic_masses = [
     258.00, 259.00, 262.00, 267.00, 270.00, 271.00, 270.00, 277.00, 276.00, 281.00,
     282.00, 285.00, 286.00, 289.00, 290.00, 293.00, 294.00, 294.00
 ]
+already_convert_mass = False
+already_convert_moles = False
 
 element_names = [
     "HYDROGEN", "HELIUM", "LITHIUM", "BERYLLIUM", "BORON", "CARBON", "NITROGEN", "OXYGEN", "FLUORINE", "NEON",
@@ -56,17 +58,21 @@ def molar_mass_calc():
     for k in range(0, len(easy_list)):
         print(easy_list[k])
 
-    molar_mass = round(total_mass, 3)
+    molar_mass = round(total_mass, 5)
     print(molar_mass)
 
 def convert_moles_grams():
+    global nums_total_moles
+    global already_convert_moles
     global molar_mass
     global new_moles
     molar_mass_calc()
     print("\n")
-    moles_nums = float(input("How many moles of the compound/element/molecule is there: "))
-    new_moles = round((moles_nums * molar_mass), 3)
-
+    if already_convert_moles == False:
+        moles_nums = float(input("How many moles of the compound/element/molecule is there: "))
+    else:
+        moles_nums = nums_total_moles
+    new_moles = round((moles_nums * molar_mass), 5)
 
 def convert_grams_moles():
     global molar_mass
@@ -74,20 +80,72 @@ def convert_grams_moles():
     molar_mass_calc()
     print("\n")
     grams_compound = float(input("How many grams of the compound/element/molecule is there: "))
-    new_grams = round((grams_compound/molar_mass), 3)
+    new_grams = round((grams_compound/molar_mass), 5)
 
-choice = input("What are you doing today (c for converting, m for molar mass calculations): ")
-
-if choice == "c":
-    convert_choice = input("Are you converting moles to grams or grams to moles (m for moles->grams, g for grams->moles): ")
-    if convert_choice == "m":
-        convert_moles_grams()
-        print(new_moles)
-    elif convert_choice == "g":
-        convert_grams_moles()
-        print(new_grams)
+def convert_moles_particles():
+    global already_convert_mass
+    global nums_total_particles
+    if already_convert_mass == False:
+        nums_moles = float(input("How many moles of the substance is there: "))
     else:
-        convert_choice = input("Wrong input, are you converting moles to grams or grams to moles (m for moles->grams, g for grams->moles): ")
-elif choice == "m":
-    molar_mass_calc()
-    print(molar_mass)
+        nums_moles = new_grams
+    nums_total_particles = nums_moles*(6.02e23)
+
+def convert_particles_moles():
+    global nums_total_moles
+    nums_particles = float(input("How many particles/atoms/molecules/formula units of the substance is there: "))
+    nums_total_moles = nums_particles/(6.02e23)
+
+def run_program():
+    global convert_choice
+    global convert_second_choice
+    global convert_third_choice
+    global already_convert_mass
+    global already_convert_moles
+
+    choice = input("What are you doing today (c for converting mass-moles, m for molar mass calculations, p for converting particles-mass, and r for converting moles-particles): ")
+
+    if choice == "c":
+        convert_choice = input("Are you converting moles to grams or grams to moles (m for moles->grams, g for grams->moles): ")
+        if convert_choice == "m":
+            convert_moles_grams()
+            print(new_moles)
+        elif convert_choice == "g":
+            convert_grams_moles()
+            print(new_grams)
+        else:
+            run_program()
+    elif choice == "m":
+        molar_mass_calc()
+        print(molar_mass)
+    elif choice == "p":
+        convert_second_choice = input("Are you converting mass to particles or particles to mass (a for mass-> particles, b for particles-> mass): ")
+        if convert_second_choice == "a":
+            convert_grams_moles()
+            already_convert_mass = True
+            convert_moles_particles()
+            print(nums_total_particles)
+            already_convert_mass = False
+        elif convert_second_choice == "b":
+             convert_particles_moles()
+             already_convert_moles = True
+             convert_moles_grams()
+             print(new_moles)
+             already_convert_moles = False
+        else:
+            run_program()
+
+    elif choice == "r":
+        convert_third_choice = input("Are you converting particles to moles or moles to particles (pm for particles-> moles and mp for moles-> particles): ")
+        if convert_third_choice == "pm":
+            convert_particles_moles()
+            print(nums_total_moles)
+        elif convert_third_choice == "mp":
+            convert_moles_particles()
+            print(nums_total_particles)
+        else:
+            run_program()
+    else:
+        run_program()
+
+run_program()
